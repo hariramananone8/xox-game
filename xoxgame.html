@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TIC TAC TOE</title>
+    <style>
+        body {
+            width: 100%;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            background-color: #0e2431;
+            padding: 10px;
+            width: fit-content;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .box {
+            width: 150px;
+            height: 150px;
+            color: rgb(255, 255, 255);
+            border: 2px solid rgb(0, 255, 157);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+        }
+
+        .statustext {
+            font-family:Verdana, Geneva, Tahoma, sans-serif;
+            font-size: larger;
+            text-align: center;
+            margin: 20px;
+            color: #333;
+            font-size: 1.5em;
+        }
+
+        button {
+            display: block;
+            margin: 10px auto;
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #0e2431;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #028d63;
+        }
+
+        .win {
+            animation: winAnimation 20ms ease-in-out infinite;
+        }
+
+        @keyframes winAnimation {
+            0% { background-color: rgb(0, 0, 0); }
+            100% { background-color: rgba(0, 255, 136, 0.219); }
+        }
+    </style>
+</head>
+<body>
+    <div class="main">
+        <h1 style="text-align: center;font-size:1cm;font-family: Verdana, Geneva, Tahoma, sans-serif;margin-bottom: 50px;">TIC TAC TOE</h1>
+        <div class="container">
+            <div class="box" data-index="0"></div>
+            <div class="box" data-index="1"></div>
+            <div class="box" data-index="2"></div>
+            <div class="box" data-index="3"></div>
+            <div class="box" data-index="4"></div>
+            <div class="box" data-index="5"></div>
+            <div class="box" data-index="6"></div>
+            <div class="box" data-index="7"></div>
+            <div class="box" data-index="8"></div>
+        </div>
+        <div class="statustext">
+            Your Chance
+        </div>
+        <button id="Restart">Restart</button>
+    </div>
+
+    <script>
+        const boxes = document.querySelectorAll('.box');
+        const statusText = document.querySelector('.statustext');
+        const btnRestart = document.querySelector('#Restart');
+
+        let x = "<img src='x.png'>";
+        let o = "<img src='o.png'>";
+
+        const winPatterns = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8],
+            [0, 3, 6], [1, 4, 7], [2, 5, 8],
+            [0, 4, 8], [2, 4, 6]
+        ];
+
+        let options = ["", "", "", "", "", "", "", "", ""];
+        let player = "X";
+        let currentPlayerSymbol = x;
+        let running = false;
+
+        init();
+
+        function init() {
+            boxes.forEach(box => box.addEventListener('click', boxClick));
+            btnRestart.addEventListener('click', restartGame);
+            statusText.textContent = `${player} Your Turn`;
+            running = true;
+        }
+
+        function boxClick() {
+            const index = this.dataset.index;
+            if (options[index] !== "" || !running) {
+                return;
+            }
+            updateBox(this, index);
+            checkWinner();
+        }
+
+        function updateBox(box, index) {
+            options[index] = player;
+            box.innerHTML = currentPlayerSymbol;
+        }
+
+        function changePlayer() {
+            player = (player === "X") ? "O" : "X";
+            currentPlayerSymbol = (currentPlayerSymbol === x) ? o : x;
+            statusText.textContent = `${player} Your Turn`;
+        }
+
+        function checkWinner() {
+            let isWon = false;
+            for (let i = 0; i < winPatterns.length; i++) {
+                const [a, b, c] = winPatterns[i];
+                const box1 = options[a];
+                const box2 = options[b];
+                const box3 = options[c];
+                if (box1 === "" || box2 === "" || box3 === "") {
+                    continue;
+                }
+                if (box1 === box2 && box2 === box3) {
+                    isWon = true;
+                    boxes[a].classList.add('win');
+                    boxes[b].classList.add('win');
+                    boxes[c].classList.add('win');
+                }
+            }
+            if (isWon) {
+                statusText.textContent = `${player} Won the game`;
+
+                running = false;
+            } else if (!options.includes("")) {
+                statusText.textContent = 'Game Draw...!';
+                running = false;
+            } else {
+                changePlayer();
+            }
+        }
+
+        function restartGame() {
+            options = ["", "", "", "", "", "", "", "", ""];
+            player = "X";
+            currentPlayerSymbol = x;
+            running = true;
+            statusText.textContent = `${player} Your Turn`;
+
+            boxes.forEach(box => {
+                box.innerHTML = "";
+                box.classList.remove('win');
+            });
+        }
+    </script>
+</body>
+</html>
